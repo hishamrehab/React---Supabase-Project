@@ -20,6 +20,11 @@ function App() {
 
   console.log(products);
 
+
+
+
+
+
   async function getProducts() {
     try {
       const { data, error } = await supabase
@@ -30,6 +35,22 @@ function App() {
       if (data != null) {
         setProducts(data); //[product1 , product2 , product3 ]
       }
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  async function createProduct() {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .insert({
+          name: name,
+          description: description,
+        })
+        .single();
+      if (error) throw error;
+      window.location.reload();
     } catch (error) {
       alert(error.message);
     }
@@ -66,7 +87,9 @@ function App() {
             />
             <br></br>
 
-            <Button>Create Product in Supabase DB</Button>
+            <Button onClick={() => createProduct()}>
+              Create Product in Supabase DB
+            </Button>
           </Col>
         </Row>
         <hr></hr>
