@@ -10,11 +10,34 @@ import {
   Button,
 } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
+import { supabase } from "./supabaseClient/supabaseClient";
 function App() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [products, setProducts] = useState([]);
+
+  console.log(products);
+
+  async function getProducts() {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .limit(10);
+      if (error) throw error;
+      if (data != null) {
+        setProducts(data); //[product1 , product2 , product3 ]
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  }
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <>
@@ -35,7 +58,6 @@ function App() {
               id="name"
               onChange={(e) => setName(e.target.value)}
             />
-
             <Form.Label>Product Description </Form.Label>
             <Form.Control
               type="text"
@@ -50,29 +72,11 @@ function App() {
         <hr></hr>
         <h3>Current database items </h3>
         <Row xs={1} lg={3} className="g-4">
-          <Col>
-            <ProductCard />
-          </Col>
-
-          <Col>
-            <ProductCard />
-          </Col>
-
-          <Col>
-            <ProductCard />
-          </Col>
-
-          <Col>
-            <ProductCard />
-          </Col>
-
-          <Col>
-            <ProductCard />
-          </Col>
-          <Col>
-            <ProductCard />
-          </Col>
-          
+          {products.map((product) => (
+            <Col>
+              <ProductCard product={product} />
+            </Col>
+          ))}
         </Row>
       </Container>
     </>
